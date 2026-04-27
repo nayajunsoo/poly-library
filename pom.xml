@@ -7,7 +7,6 @@
 	<packaging>war</packaging>
 	<version>1.0.0</version>
 	<name>poly-library</name>
-
 	<repositories>
 		<repository>
 			<id>mvn2s</id>
@@ -30,7 +29,6 @@
 			</snapshots>
 		</repository>
 	</repositories>
-
 	<properties>
 		<spring.maven.artifact.version>5.3.37</spring.maven.artifact.version>
 		<org.egovframe.rte.version>4.3.0</org.egovframe.rte.version>
@@ -39,7 +37,6 @@
 		<maven.compiler.source>17</maven.compiler.source>
 		<maven.compiler.target>17</maven.compiler.target>
 	</properties>
-
 	<dependencies>
 		<dependency>
 			<groupId>org.egovframe.rte</groupId>
@@ -51,7 +48,6 @@
 			<artifactId>org.egovframe.rte.psl.dataaccess</artifactId>
 			<version>${org.egovframe.rte.version}</version>
 		</dependency>
-
 		<dependency>
 			<groupId>javax.servlet</groupId>
 			<artifactId>javax.servlet-api</artifactId>
@@ -69,17 +65,40 @@
 			<version>1.2.5</version>
 		</dependency>
 		<dependency>
-		    <groupId>com.mysql</groupId>
-		    <artifactId>mysql-connector-j</artifactId>
-		    <version>8.3.0</version>
+			<groupId>com.mysql</groupId>
+			<artifactId>mysql-connector-j</artifactId>
+			<version>8.3.0</version>
 		</dependency>
 		<dependency>
-		    <groupId>org.apache.commons</groupId>
-		    <artifactId>commons-dbcp2</artifactId>
-		    <version>2.9.0</version>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-dbcp2</artifactId>
+			<version>2.9.0</version>
+		</dependency>
+		<!-- JSON Binding (yasson) -->
+		<dependency>
+			<groupId>org.eclipse</groupId>
+			<artifactId>yasson</artifactId>
+			<version>1.0.11</version>
+		</dependency>
+		<!-- JSON-B API -->
+		<dependency>
+			<groupId>javax.json.bind</groupId>
+			<artifactId>javax.json.bind-api</artifactId>
+			<version>1.0</version>
+		</dependency>
+		<!-- JSON-P -->
+		<dependency>
+			<groupId>org.glassfish</groupId>
+			<artifactId>javax.json</artifactId>
+			<version>1.1.4</version>
+		</dependency>
+		<!-- Jackson -->
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-databind</artifactId>
+			<version>2.15.2</version>
 		</dependency>
 	</dependencies>
-
 	<build>
 		<plugins>
 			<plugin>
