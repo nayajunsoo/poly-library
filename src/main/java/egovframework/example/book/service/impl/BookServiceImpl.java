@@ -44,4 +44,10 @@ public class BookServiceImpl implements BookService {
     public void deleteBook(int bookId) throws Exception {
         bookDAO.deleteBook(bookId);
     }
+
+    // 도서 검색
+    @Override
+    public List<BookVO> searchBookList(String searchType, String keyword) throws Exception {
+        return bookDAO.searchBookList(searchType, keyword);
+    }
 }

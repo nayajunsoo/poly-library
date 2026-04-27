@@ -26,9 +26,22 @@ public class BookController {
         return "book/bookList";
     }
 
+    // 도서 검색
+    @RequestMapping("/book/bookSearch.do")
+    public String bookSearch(
+            @RequestParam(value = "searchType", defaultValue = "title") String searchType,
+            @RequestParam(value = "keyword", defaultValue = "") String keyword,
+            ModelMap model) throws Exception {
+        List<BookVO> bookList = bookService.searchBookList(searchType, keyword);
+        model.addAttribute("bookList", bookList);
+        model.addAttribute("searchType", searchType);
+        model.addAttribute("keyword", keyword);
+        return "book/bookList";
+    }
+
     // 도서 상세
     @RequestMapping("/book/bookDetail.do")
-    public String bookDetail(@RequestParam int bookId, ModelMap model) throws Exception {
+    public String bookDetail(@RequestParam(value = "bookId") int bookId, ModelMap model) throws Exception {
         BookVO book = bookService.selectBook(bookId);
         model.addAttribute("book", book);
         return "book/bookDetail";
@@ -50,7 +63,7 @@ public class BookController {
 
     // 도서 수정 화면
     @RequestMapping("/book/bookModifyView.do")
-    public String bookModifyView(@RequestParam int bookId, ModelMap model) throws Exception {
+    public String bookModifyView(@RequestParam(value = "bookId") int bookId, ModelMap model) throws Exception {
         BookVO book = bookService.selectBook(bookId);
         model.addAttribute("book", book);
         return "book/bookModify";
@@ -65,7 +78,7 @@ public class BookController {
 
     // 도서 삭제
     @RequestMapping("/book/bookDelete.do")
-    public String bookDelete(@RequestParam int bookId) throws Exception {
+    public String bookDelete(@RequestParam(value = "bookId") int bookId) throws Exception {
         bookService.deleteBook(bookId);
         return "redirect:/book/bookList.do";
     }

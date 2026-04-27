@@ -15,10 +15,25 @@
   .nav-links a { color: #F5E6C8; text-decoration: none; margin-left: 20px; font-size: 14px; }
   .nav-links a:hover { color: #E8C87A; }
   .container { max-width: 1100px; margin: 40px auto; padding: 0 30px; }
-  .page-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 28px; }
+  .page-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
   .page-title { font-size: 26px; color: #5C3D2E; font-weight: bold; border-left: 5px solid #A0522D; padding-left: 14px; }
   .btn-register { background-color: #A0522D; color: #FFF8F0; padding: 10px 22px; border: none; border-radius: 6px; font-size: 14px; cursor: pointer; text-decoration: none; display: inline-block; transition: background 0.2s; }
   .btn-register:hover { background-color: #7B3F20; }
+
+  /* 검색창 */
+  .search-box { background: #FFFDF8; border-radius: 10px; box-shadow: 0 2px 8px rgba(92,61,46,0.1); padding: 16px 20px; margin-bottom: 20px; display: flex; gap: 10px; align-items: center; }
+  .search-box select { padding: 9px 14px; border: 1.5px solid #D4B896; border-radius: 6px; font-size: 14px; font-family: inherit; background: #FFF8F0; color: #3B2F2F; cursor: pointer; }
+  .search-box select:focus { outline: none; border-color: #A0522D; }
+  .search-box input { flex: 1; padding: 9px 14px; border: 1.5px solid #D4B896; border-radius: 6px; font-size: 14px; font-family: inherit; background: #FFF8F0; color: #3B2F2F; }
+  .search-box input:focus { outline: none; border-color: #A0522D; }
+  .btn-search { background-color: #5C3D2E; color: #FFF8F0; padding: 9px 22px; border: none; border-radius: 6px; font-size: 14px; cursor: pointer; font-family: inherit; transition: background 0.2s; white-space: nowrap; }
+  .btn-search:hover { background-color: #3D2719; }
+  .btn-reset { background-color: #E8D5B0; color: #5C3D2E; padding: 9px 16px; border: none; border-radius: 6px; font-size: 14px; cursor: pointer; text-decoration: none; display: inline-block; transition: background 0.2s; white-space: nowrap; }
+  .btn-reset:hover { background-color: #D4B896; }
+
+  /* 검색 결과 안내 */
+  .search-result { font-size: 14px; color: #7B3F20; margin-bottom: 12px; padding-left: 4px; }
+
   .table-card { background: #FFFDF8; border-radius: 12px; box-shadow: 0 2px 12px rgba(92,61,46,0.1); overflow: hidden; }
   table { width: 100%; border-collapse: collapse; table-layout: fixed; }
   thead tr { background-color: #5C3D2E; }
@@ -42,6 +57,7 @@
 </style>
 </head>
 <body>
+
 <div class="header">
   <div class="header-inner">
     <div>
@@ -54,11 +70,34 @@
     </div>
   </div>
 </div>
+
 <div class="container">
   <div class="page-header">
     <div class="page-title">도서 목록</div>
     <a href="/poly-library/book/bookRegisterView.do" class="btn-register">+ 도서 등록</a>
   </div>
+
+  <!-- 검색창 -->
+  <form action="/poly-library/book/bookSearch.do" method="get">
+    <div class="search-box">
+      <select name="searchType">
+        <option value="title"     ${searchType == 'title'     ? 'selected' : ''}>제목</option>
+        <option value="author"    ${searchType == 'author'    ? 'selected' : ''}>저자</option>
+        <option value="publisher" ${searchType == 'publisher' ? 'selected' : ''}>출판사</option>
+      </select>
+      <input type="text" name="keyword" value="${keyword}" placeholder="검색어를 입력하세요" />
+      <button type="submit" class="btn-search">🔍 검색</button>
+      <a href="/poly-library/book/bookList.do" class="btn-reset">전체보기</a>
+    </div>
+  </form>
+
+  <!-- 검색 결과 안내 -->
+  <c:if test="${not empty keyword}">
+    <div class="search-result">
+      "<strong>${keyword}</strong>" 검색 결과: ${bookList.size()}건
+    </div>
+  </c:if>
+
   <div class="table-card">
     <table>
       <colgroup>
@@ -82,7 +121,7 @@
       <tbody>
         <c:choose>
           <c:when test="${empty bookList}">
-            <tr><td colspan="6" class="empty">등록된 도서가 없습니다.</td></tr>
+            <tr><td colspan="6" class="empty">검색 결과가 없습니다.</td></tr>
           </c:when>
           <c:otherwise>
             <c:forEach var="book" items="${bookList}">
@@ -111,6 +150,7 @@
     </table>
   </div>
 </div>
+
 <div class="footer">© 2026 폴리 인공지능 도서관 · Poly AI Library</div>
 </body>
 </html>

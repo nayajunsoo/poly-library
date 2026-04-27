@@ -40,4 +40,22 @@
         WHERE BOOK_ID = #{bookId}
     </delete>
 
+    <!-- 도서 검색 -->
+    <select id="searchBookList" parameterType="map" resultType="egovframework.example.book.service.BookVO">
+        SELECT BOOK_ID, TITLE, AUTHOR, PUBLISHER, STATUS
+        FROM BOOK
+        <where>
+            <if test="searchType == 'title'">
+                AND TITLE LIKE CONCAT('%', #{keyword}, '%')
+            </if>
+            <if test="searchType == 'author'">
+                AND AUTHOR LIKE CONCAT('%', #{keyword}, '%')
+            </if>
+            <if test="searchType == 'publisher'">
+                AND PUBLISHER LIKE CONCAT('%', #{keyword}, '%')
+            </if>
+        </where>
+        ORDER BY BOOK_ID DESC
+    </select>
+
 </mapper>

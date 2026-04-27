@@ -18,4 +18,7 @@ public interface BookService {
 
     // 도서 삭제
     void deleteBook(int bookId) throws Exception;
+
+    // 도서 검색
+    List<BookVO> searchBookList(String searchType, String keyword) throws Exception;
 }
