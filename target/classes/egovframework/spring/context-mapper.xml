@@ -15,7 +15,11 @@
 			</list>
 		</property>
 	</bean>
-
+	<bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+	    <property name="basePackage" value="egovframework.example.**.service.impl" />
+	    <!-- 만약 위와 같이 **(와일드카드)가 없다면, 직접 추가해줘야 합니다. -->
+	    <!-- value="egovframework.example.book.service.impl, egovframework.example.user.service.impl" -->
+	</bean>
 	<!-- Mybatis Session Template -->
 	<bean id="egov.sqlSessionTemplate" class="org.mybatis.spring.SqlSessionTemplate">
 		<constructor-arg ref="egov.sqlSession"/>
