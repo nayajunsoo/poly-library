@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="egovframework.example.loan.service.impl.LoanMapper">
+
+    <insert id="insertLoan" parameterType="egovframework.example.loan.service.LoanVO">
+        INSERT INTO LOANS (
+            BOOK_ID, USER_ID, LOAN_DATE, DUE_DATE, STATUS
+        ) VALUES (
+            #{bookId}, #{userId}, CURDATE(), DATE_ADD(CURDATE(), INTERVAL 14 DAY), 'LOAN'
+        )
+    </insert>
+
+    <select id="selectLoanList" parameterType="string" resultType="egovframework.example.loan.service.LoanVO">
+        SELECT
+            L.LOAN_ID    as loanId,
+            L.BOOK_ID    as bookId,
+            B.TITLE      as title,
+            L.USER_ID    as userId,
+            L.LOAN_DATE  as loanDate,
+            L.DUE_DATE   as dueDate,
+            L.STATUS     as status
+        FROM LOANS L
+        JOIN BOOKS B ON L.BOOK_ID = B.BOOK_ID
+        WHERE L.USER_ID = #{userId}
+        ORDER BY L.LOAN_ID DESC
+    </select>
+
+    <update id="updateReturn" parameterType="egovframework.example.loan.service.LoanVO">
+        UPDATE LOANS
+        SET
+            STATUS      = 'RETURN',
+            RETURN_DATE = CURDATE()
+        WHERE
+            LOAN_ID = #{loanId}
+    </update>
+
+    <!-- [추가] 전체 대출 목록 조회 (관리자용) -->
+    <select id="selectAllLoanList" resultType="egovframework.example.loan.service.LoanVO">
+        SELECT
+            L.LOAN_ID    as loanId,
+            L.BOOK_ID    as bookId,
+            B.TITLE      as title,
+            L.USER_ID    as userId,
+            L.LOAN_DATE  as loanDate,
+            L.DUE_DATE   as dueDate,
+            L.RETURN_DATE as returnDate,
+            L.STATUS     as status
+        FROM LOANS L
+        JOIN BOOKS B ON L.BOOK_ID = B.BOOK_ID
+        ORDER BY L.LOAN_ID DESC
+    </select>
+
+    <!-- [추가] 연체 일괄 처리: 반납예정일 지났는데 아직 LOAN 상태인 항목을 OVERDUE로 변경 -->
+    <update id="updateOverdue">
+        UPDATE LOANS
+        SET STATUS = 'OVERDUE'
+        WHERE STATUS = 'LOAN'
+          AND DUE_DATE &lt; CURDATE()
+    </update>
+
+</mapper>
