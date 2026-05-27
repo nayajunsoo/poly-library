@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="egovframework.example.loan.service.impl.LoanMapper">
+
+    <!-- 도서 대출 처리 -->
+    <insert id="insertLoan" parameterType="egovframework.example.loan.service.LoanVO">
+        INSERT INTO LOAN (BOOK_ID, MEMBER_ID, LOAN_DATE, STATUS)
+        VALUES (#{bookId}, #{memberId}, NOW(), 'ACTIVE')
+    </insert>
+
+    <!-- 대출 후 도서 상태 'N'(대출중)으로 변경 -->
+    <update id="updateBookStatus" parameterType="int">
+        UPDATE BOOK SET STATUS = 'N' WHERE BOOK_ID = #{bookId}
+    </update>
+
+    <!-- 특정 회원 대출 목록 -->
+    <select id="selectLoanListByMember" parameterType="string"
+            resultType="egovframework.example.loan.service.LoanVO">
+        SELECT L.LOAN_ID as loanId, L.BOOK_ID as bookId, B.TITLE as bookTitle,
+               L.MEMBER_ID as memberId, U.NAME as memberName,
+               L.LOAN_DATE as loanDate, L.RETURN_DATE as returnDate, L.STATUS as status
+        FROM LOAN L
+        JOIN BOOK B ON L.BOOK_ID = B.BOOK_ID
+        JOIN USER_INFO U ON L.MEMBER_ID = U.MEMBER_ID
+        WHERE L.MEMBER_ID = #{memberId}
+        ORDER BY L.LOAN_DATE DESC
+    </select>
+
+    <!-- 전체 대출 목록 -->
+    <select id="selectAllLoanList" resultType="egovframework.example.loan.service.LoanVO">
+        SELECT L.LOAN_ID as loanId, L.BOOK_ID as bookId, B.TITLE as bookTitle,
+               L.MEMBER_ID as memberId, U.NAME as memberName,
+               L.LOAN_DATE as loanDate, L.RETURN_DATE as returnDate, L.STATUS as status
+        FROM LOAN L
+        JOIN BOOK B ON L.BOOK_ID = B.BOOK_ID
+        JOIN USER_INFO U ON L.MEMBER_ID = U.MEMBER_ID
+        ORDER BY L.LOAN_DATE DESC
+    </select>
+
+</mapper>

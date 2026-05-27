@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="egovframework.example.loan">
+
+    <!-- 회원 검색 (이름 / 전화번호 끝4자리 / 아이디) -->
+    <select id="searchMember" parameterType="map"
+            resultType="egovframework.example.member.service.MemberVO">
+        SELECT MEMBER_ID AS memberId, NAME AS name, PHONE AS phone, ROLE AS role
+        FROM USER_INFO
+        <where>
+            <if test="searchType == 'name'">
+                AND NAME LIKE CONCAT('%', #{keyword}, '%')
+            </if>
+            <if test="searchType == 'phone'">
+                AND RIGHT(REPLACE(REPLACE(PHONE, '-', ''), ' ', ''), 4) = #{keyword}
+            </if>
+            <if test="searchType == 'memberId'">
+                AND MEMBER_ID LIKE CONCAT('%', #{keyword}, '%')
+            </if>
+        </where>
+        ORDER BY NAME ASC
+    </select>
+
+    <!-- 대출 등록 -->
+    <insert id="insertLoan" parameterType="egovframework.example.loan.service.LoanVO">
+        INSERT INTO LOAN (BOOK_ID, MEMBER_ID, LOAN_DATE, STATUS)
+        VALUES (#{bookId}, #{memberId}, #{loanDate}, #{status})
+    </insert>
+
+    <!-- 대출 현황 목록 (도서명 + 회원명 JOIN) -->
+    <select id="selectLoanList" resultType="map">
+        SELECT
+            L.LOAN_ID   AS loanId,
+            B.TITLE     AS bookTitle,
+            B.AUTHOR    AS bookAuthor,
+            U.NAME      AS memberName,
+            U.PHONE     AS memberPhone,
+            L.LOAN_DATE AS loanDate,
+            L.STATUS    AS status
+        FROM LOAN L
+        JOIN BOOK     B ON L.BOOK_ID   = B.BOOK_ID
+        JOIN USER_INFO U ON L.MEMBER_ID = U.MEMBER_ID
+        ORDER BY L.LOAN_ID DESC
+    </select>
+
+</mapper>
