@@ -1,0 +1,107 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib prefix="c"  uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>내 대출 현황 - 폴리 인공지능 도서관</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:'Georgia',serif; background-color:#F5F0E8; color:#3B2F2F; min-height:100vh; }
+.header { background-color:#5C3D2E; box-shadow:0 2px 8px rgba(0,0,0,0.3); }
+.header-inner { max-width:1100px; margin:0 auto; padding:20px 30px; display:flex; align-items:center; justify-content:space-between; }
+.header h1 { color:#F5E6C8; font-size:22px; letter-spacing:1px; }
+.subtitle { color:#C4A882; font-size:13px; margin-top:4px; }
+.nav-links { display:flex; align-items:center; gap:20px; }
+.nav-links a { color:#F5E6C8; text-decoration:none; font-size:14px; }
+.nav-links a:hover { color:#E8C87A; }
+.container { max-width:900px; margin:40px auto; padding:0 30px; }
+.page-title { font-size:24px; color:#5C3D2E; font-weight:bold; border-left:5px solid #A0522D; padding-left:14px; margin-bottom:24px; }
+.empty-box { background:#FFFDF8; border-radius:12px; padding:60px; text-align:center; color:#A08060; font-size:15px; box-shadow:0 2px 12px rgba(92,61,46,0.08); }
+.loan-card { background:#FFFDF8; border-radius:12px; box-shadow:0 2px 12px rgba(92,61,46,0.1); margin-bottom:16px; overflow:hidden; border-left:4px solid #5C3D2E; transition:box-shadow 0.2s; }
+.loan-card:hover { box-shadow:0 4px 20px rgba(92,61,46,0.15); }
+.loan-card.overdue { border-left-color:#C62828; }
+.loan-card.warn { border-left-color:#E65100; }
+.card-inner { padding:20px 24px; display:flex; align-items:center; gap:20px; }
+.card-dday { min-width:72px; text-align:center; }
+.dday-ok { background:#E8F5E9; color:#2E7D32; border-radius:8px; padding:8px 12px; font-size:15px; font-weight:bold; }
+.dday-warn { background:#FFF3E0; color:#E65100; border-radius:8px; padding:8px 12px; font-size:15px; font-weight:bold; }
+.dday-over { background:#FFEBEE; color:#C62828; border-radius:8px; padding:8px 12px; font-size:15px; font-weight:bold; }
+.card-info { flex:1; }
+.book-title { font-size:16px; font-weight:bold; color:#3B2F2F; margin-bottom:4px; }
+.book-author { font-size:13px; color:#A08060; margin-bottom:8px; }
+.date-row { font-size:12px; color:#888; display:flex; gap:16px; }
+.date-row span { display:flex; align-items:center; gap:4px; }
+.overdue-msg { font-size:12px; color:#C62828; font-weight:bold; margin-top:6px; }
+.btn-return { background:#5C3D2E; color:#FFF8F0; border:none; border-radius:6px; padding:10px 20px; font-size:13px; font-weight:bold; cursor:pointer; font-family:inherit; white-space:nowrap; }
+.btn-return:hover { background:#3D2719; }
+.btn-back { display:inline-block; margin-top:24px; color:#A0522D; text-decoration:none; font-size:14px; }
+.btn-back:hover { text-decoration:underline; }
+.summary-bar { background:#EEF7F4; border:1px solid #A8D5C8; border-radius:8px; padding:12px 18px; margin-bottom:24px; font-size:13px; color:#2E7D6B; display:flex; gap:20px; }
+.summary-bar .s-num { font-weight:bold; font-size:16px; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-inner">
+    <div>
+      <h1>📚 폴리 인공지능 도서관</h1>
+      <div class="subtitle">Poly AI Library Management System</div>
+    </div>
+    <div class="nav-links">
+      <a href="${pageContext.request.contextPath}/book/bookList.do">도서 목록</a>
+      <a href="${pageContext.request.contextPath}/loan/myLoan.do">내 대출 현황</a>
+      <a href="${pageContext.request.contextPath}/user/logout.do" onclick="return confirm('로그아웃 하시겠습니까?')">로그아웃</a>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="page-title">📋 내 대출 현황</div>
+
+  <c:choose>
+    <c:when test="${empty loanList}">
+      <div class="empty-box">
+        현재 대출 중인 도서가 없습니다.<br><br>
+        <a href="${pageContext.request.contextPath}/book/bookList.do" style="color:#A0522D;text-decoration:none;font-weight:bold;">도서 목록에서 대출하기 →</a>
+      </div>
+    </c:when>
+    <c:otherwise>
+      <div class="summary-bar">
+        <span>대출 중인 도서 <span class="s-num">${fn:length(loanList)}권</span></span>
+      </div>
+      <c:forEach var="loan" items="${loanList}">
+        <div class="loan-card ${loan.ddayClass == 'dday-over' ? 'overdue' : (loan.ddayClass == 'dday-warn' ? 'warn' : '')}">
+          <div class="card-inner">
+            <div class="card-dday">
+              <div class="${loan.ddayClass}">${loan.ddayLabel}</div>
+            </div>
+            <div class="card-info">
+              <div class="book-title">${loan.bookTitle}</div>
+              <div class="book-author">${loan.bookAuthor}</div>
+              <div class="date-row">
+                <span>대출일: ${loan.loanDate}</span>
+                <span>반납예정일: ${loan.returnDate}</span>
+              </div>
+              <c:if test="${loan.ddayClass == 'dday-over'}">
+                <div class="overdue-msg">⚠ 반납 예정일이 ${-loan.dday}일 지났습니다. 빠른 반납을 부탁드립니다.</div>
+              </c:if>
+            </div>
+            <form action="${pageContext.request.contextPath}/loan/returnLoan.do" method="post" style="flex-shrink:0;">
+              <input type="hidden" name="loanId" value="${loan.loanId}">
+              <input type="hidden" name="bookId" value="${loan.bookId}">
+              <button type="submit" class="btn-return" onclick="return confirm('반납하시겠습니까?')">반납하기</button>
+            </form>
+          </div>
+        </div>
+      </c:forEach>
+    </c:otherwise>
+  </c:choose>
+
+  <a href="${pageContext.request.contextPath}/book/bookList.do" class="btn-back">← 도서 목록으로 돌아가기</a>
+</div>
+
+</body>
+</html>
