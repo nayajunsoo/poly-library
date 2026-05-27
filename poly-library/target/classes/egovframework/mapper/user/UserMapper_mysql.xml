@@ -12,15 +12,22 @@
         WHERE MEMBER_ID = #{userId} AND PASSWORD = #{password}
     </select>
 
+<<<<<<< HEAD
     <!-- 회원가입 -->
+=======
+    <!-- 회원가입 (phone 포함) -->
+>>>>>>> c35c9fa3da37ff3babc985bb0c77426861bb6aa1
     <insert id="insertUser" parameterType="egovframework.example.member.service.MemberVO">
         INSERT INTO USER_INFO (MEMBER_ID, PASSWORD, NAME, ROLE, PHONE)
         VALUES (#{memberId}, #{password}, #{name}, #{role}, #{phone})
     </insert>
 
+<<<<<<< HEAD
     <!-- 아이디 중복 체크 -->
     <select id="countById" parameterType="String" resultType="int">
         SELECT COUNT(*) FROM USER_INFO WHERE MEMBER_ID = #{memberId}
     </select>
 
+=======
+>>>>>>> c35c9fa3da37ff3babc985bb0c77426861bb6aa1
 </mapper>

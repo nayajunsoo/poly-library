@@ -2,6 +2,7 @@ package egovframework.example.loan.web;
 
 import java.time.LocalDate;
 import java.util.List;
+<<<<<<< HEAD
 import java.util.Map;
 
 import javax.annotation.Resource;
@@ -20,6 +21,22 @@ import egovframework.example.book.service.BookVO;
 import egovframework.example.loan.service.LoanService;
 import egovframework.example.loan.service.LoanVO;
 import egovframework.example.user.service.UserVO;
+=======
+
+import javax.annotation.Resource;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import egovframework.example.book.service.BookVO;
+import egovframework.example.loan.service.LoanService;
+import egovframework.example.loan.service.LoanVO;
+import egovframework.example.member.service.MemberVO;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+>>>>>>> c35c9fa3da37ff3babc985bb0c77426861bb6aa1
 
 @Controller
 public class LoanController {
@@ -29,7 +46,14 @@ public class LoanController {
 
     private final ObjectMapper mapper = new ObjectMapper();
 
+<<<<<<< HEAD
     /** 도서 검색 AJAX */
+=======
+    /**
+     * 도서 검색 AJAX  →  JSON 반환
+     * GET /loan/searchBook.do?searchType=title&keyword=노인
+     */
+>>>>>>> c35c9fa3da37ff3babc985bb0c77426861bb6aa1
     @RequestMapping("/loan/searchBook.do")
     @ResponseBody
     public String searchBook(
@@ -39,6 +63,7 @@ public class LoanController {
         return mapper.writeValueAsString(list);
     }
 
+<<<<<<< HEAD
     /** 단건 대출 신청 */
     @RequestMapping(value = "/loan/loanApply.do", method = RequestMethod.POST)
     public String loanApply(
@@ -134,5 +159,37 @@ public class LoanController {
     private String encodeMsg(String msg) {
         try { return java.net.URLEncoder.encode(msg, "UTF-8"); }
         catch(Exception e) { return msg; }
+=======
+    /**
+     * 회원 검색 AJAX  →  JSON 반환
+     * GET /loan/searchMember.do?searchType=name&keyword=박준수
+     */
+    @RequestMapping("/loan/searchMember.do")
+    @ResponseBody
+    public String searchMember(
+            @RequestParam(defaultValue = "name") String searchType,
+            @RequestParam(defaultValue = "") String keyword) throws Exception {
+        List<MemberVO> list = loanService.searchMember(searchType, keyword);
+        // 보안: password 필드는 null 처리
+        for (MemberVO m : list) { m.setPassword(null); }
+        return mapper.writeValueAsString(list);
+    }
+
+    /**
+     * 대출 신청 처리
+     * POST /loan/loanApply.do
+     */
+    @RequestMapping("/loan/loanApply.do")
+    public String loanApply(
+            @RequestParam int    bookId,
+            @RequestParam String memberId) throws Exception {
+        LoanVO loanVO = new LoanVO();
+        loanVO.setBookId(bookId);
+        loanVO.setMemberId(memberId);
+        loanVO.setLoanDate(LocalDate.now().toString());
+        loanVO.setStatus("ACTIVE");
+        loanService.insertLoan(loanVO);
+        return "redirect:/book/bookList.do?loanSuccess=true";
+>>>>>>> c35c9fa3da37ff3babc985bb0c77426861bb6aa1
     }
 }

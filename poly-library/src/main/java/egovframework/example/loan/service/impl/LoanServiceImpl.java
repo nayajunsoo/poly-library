@@ -1,8 +1,11 @@
 package egovframework.example.loan.service.impl;
 
+<<<<<<< HEAD
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
+=======
+>>>>>>> c35c9fa3da37ff3babc985bb0c77426861bb6aa1
 import java.util.List;
 import java.util.Map;
 
@@ -22,6 +25,7 @@ public class LoanServiceImpl implements LoanService {
     @Resource(name = "egov.sqlSessionTemplate")
     private SqlSession sqlSession;
 
+<<<<<<< HEAD
     private static final String NS_LOAN = "egovframework.example.loan.";
     private static final String NS_BOOK = "egovframework.example.book.";
 
@@ -31,10 +35,22 @@ public class LoanServiceImpl implements LoanService {
         param.put("searchType", searchType);
         param.put("keyword", keyword);
         return sqlSession.selectList(NS_BOOK + "searchBookList", param);
+=======
+    private static final String NAMESPACE_LOAN = "egovframework.example.loan.";
+    private static final String NAMESPACE_BOOK = "egovframework.example.book.";
+
+    @Override
+    public List<BookVO> searchBook(String searchType, String keyword) throws Exception {
+        java.util.Map<String, String> param = new java.util.HashMap<>();
+        param.put("searchType", searchType);
+        param.put("keyword", keyword);
+        return sqlSession.selectList(NAMESPACE_BOOK + "searchBookList", param);
+>>>>>>> c35c9fa3da37ff3babc985bb0c77426861bb6aa1
     }
 
     @Override
     public List<MemberVO> searchMember(String searchType, String keyword) throws Exception {
+<<<<<<< HEAD
         Map<String, String> param = new HashMap<>();
         param.put("searchType", searchType);
         param.put("keyword", keyword);
@@ -48,10 +64,17 @@ public class LoanServiceImpl implements LoanService {
         param.put("memberId", memberId);
         int cnt = sqlSession.selectOne(NS_LOAN + "countActiveByBookAndMember", param);
         return cnt > 0;
+=======
+        java.util.Map<String, String> param = new java.util.HashMap<>();
+        param.put("searchType", searchType);
+        param.put("keyword", keyword);
+        return sqlSession.selectList(NAMESPACE_LOAN + "searchMember", param);
+>>>>>>> c35c9fa3da37ff3babc985bb0c77426861bb6aa1
     }
 
     @Override
     public void insertLoan(LoanVO loanVO) throws Exception {
+<<<<<<< HEAD
         // 중복 대출 방지
         if (isAlreadyLoaned(loanVO.getBookId(), loanVO.getMemberId())) {
             throw new Exception("이미 대출 중인 도서입니다.");
@@ -121,5 +144,18 @@ public class LoanServiceImpl implements LoanService {
                 }
             }
         }
+=======
+        // 1. 대출 이력 INSERT
+        sqlSession.insert(NAMESPACE_LOAN + "insertLoan", loanVO);
+        // 2. 도서 상태 → 대출중(N)
+        sqlSession.update(NAMESPACE_BOOK + "updateBookStatus",
+            new java.util.HashMap<String,Object>(){{ put("bookId", loanVO.getBookId()); put("status","N"); }});
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public List<Map<String, Object>> selectLoanList() throws Exception {
+        return sqlSession.selectList(NAMESPACE_LOAN + "selectLoanList");
+>>>>>>> c35c9fa3da37ff3babc985bb0c77426861bb6aa1
     }
 }

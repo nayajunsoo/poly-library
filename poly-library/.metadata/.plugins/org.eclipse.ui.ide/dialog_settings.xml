@@ -6,7 +6,11 @@
 		<item key="SmartImportRootWizardPage.STORE_NESTED_PROJECTS" value="true"/>
 		<item key="SmartImportRootWizardPage.STORE_CONFIGURE_NATURES" value="true"/>
 		<list key="org.eclipse.ui.internal.wizards.datatransfer.SmartImportRootWizardPage.knownSources">
+<<<<<<< HEAD
 			<item value="C:\eGov\workspace-egov\poly-library-v3\poly-library-updated2\poly-library"/>
+=======
+			<item value="C:\dev\workspace-library\poly-library-updated"/>
+>>>>>>> c35c9fa3da37ff3babc985bb0c77426861bb6aa1
 		</list>
 		<section name="SmartImportWizard.dialogBounds">
 			<item key="DIALOG_X_ORIGIN" value="524"/>

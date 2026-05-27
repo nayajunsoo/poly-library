@@ -17,6 +17,7 @@
         <context:exclude-filter type="annotation" expression="org.springframework.stereotype.Repository"/>
     </context:component-scan>
 
+<<<<<<< HEAD
     <mvc:annotation-driven>
         <mvc:message-converters>
             <bean class="org.springframework.http.converter.StringHttpMessageConverter">
@@ -29,6 +30,9 @@
             </bean>
         </mvc:message-converters>
     </mvc:annotation-driven>
+=======
+    <mvc:annotation-driven/>
+>>>>>>> c35c9fa3da37ff3babc985bb0c77426861bb6aa1
 
     <!-- jsonView -->
     <bean id="viewResolver" class="org.springframework.web.servlet.view.BeanNameViewResolver" p:order="0"/>
