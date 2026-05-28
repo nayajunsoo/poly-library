@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans-4.0.xsd">
+
+    <bean id="egov.lobHandler" class="org.springframework.jdbc.support.lob.DefaultLobHandler" lazy-init="true"/>
+
+    <bean id="egov.sqlSession" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <property name="dataSource" ref="dataSource"/>
+        <property name="configLocation" value="classpath:/egovframework/mapper/config/mapper-config.xml"/>
+        <property name="mapperLocations">
+            <list>
+                <value>classpath:/egovframework/mapper/hyb/**/*_mysql.xml</value>
+                <value>classpath:/egovframework/mapper/user/*_mysql.xml</value>
+            </list>
+        </property>
+    </bean>
+
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <property name="basePackage" value="egovframework.example.**.service.impl"/>
+    </bean>
+
+    <bean id="egov.sqlSessionTemplate" class="org.mybatis.spring.SqlSessionTemplate">
+        <constructor-arg ref="egov.sqlSession"/>
+    </bean>
+
+</beans>

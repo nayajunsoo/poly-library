@@ -1,0 +1,7 @@
+INDEX VERSION 1.4+C:\eGov\workspace-egov\poly-library-v3\poly-library-updated2\.metadata\.plugins\org.eclipse.wst.jsdt.core\indexes
+398351806.index
+2993064503.index
+2971202505.index
+2118847137.index
+2104030881.index
+842246663.index
