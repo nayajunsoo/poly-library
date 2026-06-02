@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="egovframework.example.book">
+
+    <select id="selectBookList" resultType="egovframework.example.book.service.BookVO">
+        SELECT BOOK_ID AS bookId, TITLE AS title, AUTHOR AS author,
+               PUBLISHER AS publisher, STATUS AS status, CATEGORY AS category
+        FROM BOOK ORDER BY BOOK_ID DESC
+    </select>
+
+    <select id="selectBook" parameterType="int" resultType="egovframework.example.book.service.BookVO">
+        SELECT BOOK_ID AS bookId, TITLE AS title, AUTHOR AS author,
+               PUBLISHER AS publisher, STATUS AS status, CATEGORY AS category
+        FROM BOOK WHERE BOOK_ID = #{bookId}
+    </select>
+
+    <insert id="insertBook" parameterType="egovframework.example.book.service.BookVO">
+        INSERT INTO BOOK (TITLE, AUTHOR, PUBLISHER, STATUS, CATEGORY)
+        VALUES (#{title}, #{author}, #{publisher}, #{status}, #{category})
+    </insert>
+
+    <update id="updateBook" parameterType="egovframework.example.book.service.BookVO">
+        UPDATE BOOK SET TITLE=#{title}, AUTHOR=#{author},
+               PUBLISHER=#{publisher}, STATUS=#{status}, CATEGORY=#{category}
+        WHERE BOOK_ID=#{bookId}
+    </update>
+
+    <update id="updateBookStatus" parameterType="map">
+        UPDATE BOOK SET STATUS=#{status} WHERE BOOK_ID=#{bookId}
+    </update>
+
+    <delete id="deleteBook" parameterType="int">
+        DELETE FROM BOOK WHERE BOOK_ID=#{bookId}
+    </delete>
+
+    <select id="searchBookList" parameterType="map" resultType="egovframework.example.book.service.BookVO">
+        SELECT BOOK_ID AS bookId, TITLE AS title, AUTHOR AS author,
+               PUBLISHER AS publisher, STATUS AS status, CATEGORY AS category
+        FROM BOOK
+        <where>
+            <if test="searchType == 'title'">AND TITLE LIKE CONCAT('%',#{keyword},'%')</if>
+            <if test="searchType == 'author'">AND AUTHOR LIKE CONCAT('%',#{keyword},'%')</if>
+            <if test="searchType == 'publisher'">AND PUBLISHER LIKE CONCAT('%',#{keyword},'%')</if>
+            <if test="searchType == 'category'">AND CATEGORY = #{keyword}</if>
+        </where>
+        ORDER BY TITLE ASC
+    </select>
+
+    <!-- 페이지네이션 + 필터 통합 쿼리 -->
+    <select id="selectBookListPaged" parameterType="map" resultType="egovframework.example.book.service.BookVO">
+        SELECT BOOK_ID AS bookId, TITLE AS title, AUTHOR AS author,
+               PUBLISHER AS publisher, STATUS AS status, CATEGORY AS category
+        FROM BOOK
+        <where>
+            <if test="keyword != null and keyword != ''">
+                <choose>
+                    <when test="searchType == 'title'">AND TITLE LIKE CONCAT('%',#{keyword},'%')</when>
+                    <when test="searchType == 'author'">AND AUTHOR LIKE CONCAT('%',#{keyword},'%')</when>
+                    <when test="searchType == 'publisher'">AND PUBLISHER LIKE CONCAT('%',#{keyword},'%')</when>
+                </choose>
+            </if>
+            <if test="category != null and category != ''">AND CATEGORY = #{category}</if>
+            <if test="initial != null and initial != ''">AND TITLE LIKE CONCAT(#{initial},'%')</if>
+            <if test="statusFilter != null and statusFilter != ''">AND STATUS = #{statusFilter}</if>
+        </where>
+        <choose>
+            <when test="sortType == 'title'">ORDER BY TITLE ASC</when>
+            <when test="sortType == 'loanCount'">
+                ORDER BY (SELECT COUNT(*) FROM LOAN L WHERE L.BOOK_ID = BOOK.BOOK_ID) DESC, TITLE ASC
+            </when>
+            <otherwise>ORDER BY TITLE ASC</otherwise>
+        </choose>
+        LIMIT #{pageSize} OFFSET #{offset}
+    </select>
+
+    <select id="selectBookCount" parameterType="map" resultType="int">
+        SELECT COUNT(*) FROM BOOK
+        <where>
+            <if test="keyword != null and keyword != ''">
+                <choose>
+                    <when test="searchType == 'title'">AND TITLE LIKE CONCAT('%',#{keyword},'%')</when>
+                    <when test="searchType == 'author'">AND AUTHOR LIKE CONCAT('%',#{keyword},'%')</when>
+                    <when test="searchType == 'publisher'">AND PUBLISHER LIKE CONCAT('%',#{keyword},'%')</when>
+                </choose>
+            </if>
+            <if test="category != null and category != ''">AND CATEGORY = #{category}</if>
+            <if test="initial != null and initial != ''">AND TITLE LIKE CONCAT(#{initial},'%')</if>
+            <if test="statusFilter != null and statusFilter != ''">AND STATUS = #{statusFilter}</if>
+        </where>
+    </select>
+
+</mapper>
