@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="egovframework.example.loan">
+
+    <select id="searchMember" parameterType="map" resultType="egovframework.example.member.service.MemberVO">
+        SELECT MEMBER_ID AS memberId, NAME AS name, PHONE AS phone, ROLE AS role
+        FROM USER_INFO
+        <where>
+            <if test="searchType == 'name'">AND NAME LIKE CONCAT('%',#{keyword},'%')</if>
+            <if test="searchType == 'phone'">AND RIGHT(REPLACE(REPLACE(PHONE,'-',''),' ',''),4)=#{keyword}</if>
+            <if test="searchType == 'memberId'">AND MEMBER_ID LIKE CONCAT('%',#{keyword},'%')</if>
+        </where>
+        ORDER BY NAME ASC
+    </select>
+
+    <select id="countActiveByBookAndMember" parameterType="map" resultType="int">
+        SELECT COUNT(*) FROM LOAN
+        WHERE BOOK_ID=#{bookId} AND MEMBER_ID=#{memberId} AND STATUS IN ('ACTIVE','PENDING')
+    </select>
+
+    <insert id="insertLoan" parameterType="egovframework.example.loan.service.LoanVO">
+        INSERT INTO LOAN (BOOK_ID, MEMBER_ID, LOAN_DATE, RETURN_DATE, STATUS)
+        VALUES (#{bookId}, #{memberId}, #{loanDate}, #{returnDate}, #{status})
+    </insert>
+
+    <!-- 유저 내 대출 현황 (ACTIVE + PENDING) -->
+    <select id="selectMyLoanList" parameterType="String" resultType="map">
+        SELECT L.LOAN_ID AS loanId, L.BOOK_ID AS bookId, B.TITLE AS bookTitle,
+               B.AUTHOR AS bookAuthor, B.CATEGORY AS bookCategory,
+               L.LOAN_DATE AS loanDate, L.RETURN_DATE AS returnDate,
+               L.STATUS AS status
+        FROM LOAN L JOIN BOOK B ON L.BOOK_ID=B.BOOK_ID
+        WHERE L.MEMBER_ID=#{memberId} AND L.STATUS IN ('ACTIVE','PENDING')
+        ORDER BY L.LOAN_ID DESC
+    </select>
+
+    <!-- 헤더 드롭다운 요약 (최근 3건) -->
+    <select id="selectMyLoanSummary" parameterType="String" resultType="map">
+        SELECT L.LOAN_ID AS loanId, L.BOOK_ID AS bookId, B.TITLE AS bookTitle,
+               L.LOAN_DATE AS loanDate, L.RETURN_DATE AS returnDate, L.STATUS AS status
+        FROM LOAN L JOIN BOOK B ON L.BOOK_ID=B.BOOK_ID
+        WHERE L.MEMBER_ID=#{memberId} AND L.STATUS IN ('ACTIVE','PENDING')
+        ORDER BY L.LOAN_ID DESC LIMIT 3
+    </select>
+
+    <!-- 반납 요청 (유저 클릭) - PENDING으로 변경 -->
+    <update id="requestReturn" parameterType="int">
+        UPDATE LOAN SET STATUS='PENDING' WHERE LOAN_ID=#{loanId} AND STATUS='ACTIVE'
+    </update>
+
+    <!-- 반납 승인 (어드민 클릭) - RETURNED로 변경 + 실제반납일 기록 -->
+    <update id="approveReturn" parameterType="map">
+        UPDATE LOAN SET STATUS='RETURNED', ACTUAL_RETURN_DATE=#{actualReturnDate}
+        WHERE LOAN_ID=#{loanId}
+    </update>
+
+    <!-- 어드민: 반납 대기 목록 -->
+    <select id="selectPendingReturnList" resultType="map">
+        SELECT L.LOAN_ID AS loanId, L.BOOK_ID AS bookId,
+               B.TITLE AS bookTitle, B.AUTHOR AS bookAuthor,
+               L.MEMBER_ID AS memberId, U.NAME AS memberName, U.PHONE AS memberPhone,
+               L.LOAN_DATE AS loanDate, L.RETURN_DATE AS returnDate
+        FROM LOAN L
+        JOIN BOOK B ON L.BOOK_ID=B.BOOK_ID
+        JOIN USER_INFO U ON L.MEMBER_ID=U.MEMBER_ID
+        WHERE L.STATUS='PENDING'
+        ORDER BY L.LOAN_ID ASC
+    </select>
+
+    <!-- 어드민: 전체 대출 현황 -->
+    <select id="selectAllLoanList" resultType="map">
+        SELECT L.LOAN_ID AS loanId, L.BOOK_ID AS bookId,
+               B.TITLE AS bookTitle,
+               L.MEMBER_ID AS memberId, U.NAME AS memberName,
+               L.LOAN_DATE AS loanDate, L.RETURN_DATE AS returnDate,
+               L.STATUS AS status
+        FROM LOAN L
+        JOIN BOOK B ON L.BOOK_ID=B.BOOK_ID
+        JOIN USER_INFO U ON L.MEMBER_ID=U.MEMBER_ID
+        WHERE L.STATUS IN ('ACTIVE','PENDING')
+        ORDER BY L.LOAN_ID DESC
+        LIMIT 50
+    </select>
+
+    <!-- 월간 인기도서 TOP 30 -->
+    <select id="selectMonthlyTop30" resultType="map">
+        SELECT B.BOOK_ID AS bookId, B.TITLE AS title, B.AUTHOR AS author,
+               B.PUBLISHER AS publisher, B.CATEGORY AS category, B.STATUS AS status,
+               COUNT(L.LOAN_ID) AS loanCount
+        FROM BOOK B
+        LEFT JOIN LOAN L ON B.BOOK_ID = L.BOOK_ID
+            AND L.LOAN_DATE >= DATE_FORMAT(NOW(), '%Y-%m-01')
+            AND L.LOAN_DATE &lt; DATE_FORMAT(DATE_ADD(NOW(), INTERVAL 1 MONTH), '%Y-%m-01')
+        GROUP BY B.BOOK_ID, B.TITLE, B.AUTHOR, B.PUBLISHER, B.CATEGORY, B.STATUS
+        ORDER BY loanCount DESC, B.BOOK_ID ASC
+        LIMIT 30
+    </select>
+
+</mapper>

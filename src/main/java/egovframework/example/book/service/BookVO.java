@@ -5,13 +5,13 @@ import java.io.Serializable;
 public class BookVO implements Serializable {
     private static final long serialVersionUID = 1L;
 
-    private int bookId;        // 도서 번호
-    private String title;      // 제목
-    private String author;     // 저자
-    private String publisher;  // 출판사
-    private String status;     // 대출 상태
+    private int bookId;
+    private String title;
+    private String author;
+    private String publisher;
+    private String status;
+    private String category;
 
-    // Getter & Setter
     public int getBookId() { return bookId; }
     public void setBookId(int bookId) { this.bookId = bookId; }
     public String getTitle() { return title; }
@@ -22,4 +22,6 @@ public class BookVO implements Serializable {
     public void setPublisher(String publisher) { this.publisher = publisher; }
     public String getStatus() { return status; }
     public void setStatus(String status) { this.status = status; }
+    public String getCategory() { return category; }
+    public void setCategory(String category) { this.category = category; }
 }

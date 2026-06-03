@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="egovframework.example.user.service.impl.UserMapper">
+
+    <select id="actionLogin" parameterType="egovframework.example.user.service.UserVO"
+            resultType="egovframework.example.user.service.UserVO">
+        SELECT MEMBER_ID AS userId, NAME AS userName, ROLE AS role, PHONE AS phone, EMAIL AS email
+        FROM USER_INFO
+        WHERE MEMBER_ID = #{userId} AND PASSWORD = #{password}
+    </select>
+
+    <insert id="insertUser" parameterType="egovframework.example.member.service.MemberVO">
+        INSERT INTO USER_INFO (MEMBER_ID, PASSWORD, NAME, ROLE, PHONE, EMAIL)
+        VALUES (#{memberId}, #{password}, #{name}, #{role}, #{phone}, #{email})
+    </insert>
+
+    <select id="countById" parameterType="String" resultType="int">
+        SELECT COUNT(*) FROM USER_INFO WHERE MEMBER_ID = #{memberId}
+    </select>
+
+    <!-- 어드민: 전체 유저 목록 조회 -->
+    <select id="selectAllUsers" resultType="egovframework.example.member.service.MemberVO">
+        SELECT MEMBER_ID AS memberId, NAME AS name, ROLE AS role, PHONE AS phone, EMAIL AS email
+        FROM USER_INFO
+        ORDER BY ROLE DESC, MEMBER_ID ASC
+    </select>
+
+    <!-- 어드민: 유저 권한 변경 -->
+    <update id="updateUserRole" parameterType="map">
+        UPDATE USER_INFO SET ROLE = #{role} WHERE MEMBER_ID = #{memberId}
+    </update>
+
+</mapper>
