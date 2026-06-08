@@ -5,10 +5,12 @@
 <html>
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;700&display=swap" rel="stylesheet">
 <title>도서 목록 - 폴리 인공지능 도서관</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;}
+html,body{overflow-x:hidden;max-width:100%;}
 body{font-family:'Noto Serif KR',serif;background:#F5F0E8;color:#3B2F2F;min-height:100vh;}
 .header{background:#5C3D2E;box-shadow:0 2px 8px rgba(0,0,0,0.3);position:sticky;top:0;z-index:100;}
 .header-inner{max-width:1200px;margin:0 auto;padding:13px 28px;display:flex;align-items:center;justify-content:space-between;gap:16px;}
@@ -120,6 +122,51 @@ hr.mdv{border:none;border-top:1px solid #EDE0CE;margin:9px 0;}
 .toast{display:none;position:fixed;top:18px;left:50%;transform:translateX(-50%);background:#2E7D6B;color:#fff;padding:9px 20px;border-radius:6px;font-size:12px;font-weight:bold;z-index:9999;}
 .toast.err{background:#C62828;}
 .footer{text-align:center;padding:18px;color:#A08060;font-size:11px;border-top:1px solid #DDD0BC;margin-top:30px;}
+.hamburger{display:none;background:none;border:none;color:#F5E6C8;font-size:24px;cursor:pointer;padding:4px 8px;line-height:1;flex-shrink:0;}
+.sidebar-toggle{display:none;width:100%;background:#5C3D2E;color:#F5E6C8;border:none;border-radius:8px;padding:10px 16px;font-size:13px;font-family:inherit;cursor:pointer;margin-bottom:10px;text-align:left;}
+.sidebar-toggle::after{content:' ▼';font-size:11px;}
+.sidebar-toggle.open::after{content:' ▲';}
+@media (max-width:767px){
+  .header,.header-inner,.layout,.main-content,.search-area,.result-hdr,.table-wrap,.paging,.modal{max-width:100%;box-sizing:border-box;}
+  .hamburger{display:block;}
+  .hdr-search{display:none;}
+  .nav-links{display:none;}
+  .header-inner{padding:10px 14px;}
+  .logo a{font-size:15px;}
+  .layout{grid-template-columns:1fr;padding:0 12px;margin:16px auto;gap:0;}
+  .sidebar-toggle{display:block;}
+  .sidebar{display:none;}
+  .sidebar.open{display:block;}
+  .search-area{flex-wrap:wrap;padding:10px 12px;gap:8px;}
+  .search-area select{width:100%;}
+  .search-area input{width:100%;}
+  .btn-srch,.btn-reset{flex:1;}
+  .result-hdr{flex-direction:column;align-items:flex-start;gap:8px;}
+  /* 테이블 → 카드 변환 */
+  .table-wrap{background:transparent;box-shadow:none;border-radius:0;overflow:visible;}
+  table,tbody,tr,td{display:block;}
+  thead{display:none;}
+  tbody tr{background:#FFFDF8;border-radius:10px;box-shadow:0 2px 8px rgba(92,61,46,0.1);margin-bottom:10px;border-left:4px solid #5C3D2E;overflow:hidden;}
+  tbody tr:hover{background:#FFF8EE;}
+  tbody td{display:flex;align-items:center;gap:8px;padding:9px 14px!important;font-size:13px;text-align:left!important;border-bottom:1px solid #F0E8DC;}
+  tbody td:last-child{border-bottom:none;}
+  tbody td::before{content:attr(data-label);font-size:11px;font-weight:bold;color:#A08060;min-width:54px;flex-shrink:0;}
+  tbody td.td-num{display:none;}
+  tbody td.td-empty{justify-content:center;padding:28px 14px!important;}
+  tbody td.td-empty::before{display:none;}
+  .modal{max-width:100%;max-height:95vh;padding:14px 12px 10px;border-radius:8px;}
+  .ms-row{flex-wrap:wrap;}
+  .ms-row select{width:100%;}
+  .paging{gap:3px;}
+  .p-btn{padding:8px 10px;font-size:12px;}
+}
+@media (min-width:768px) and (max-width:1024px){
+  .layout{grid-template-columns:180px 1fr;padding:0 16px;gap:14px;}
+  .header-inner{padding:10px 16px;}
+  .hdr-search{max-width:260px;}
+  .modal{max-width:90%;}
+  .chosung-grid{grid-template-columns:repeat(4,1fr);}
+}
 </style>
 </head>
 <body>
@@ -164,12 +211,17 @@ hr.mdv{border:none;border-top:1px solid #EDE0CE;margin:9px 0;}
         </c:otherwise>
       </c:choose>
     </div>
+    <button class="hamburger" onclick="openMobileNav()">☰</button>
   </div>
 </div>
 
 <div class="layout">
+  <!-- 모바일 사이드바 토글 -->
+  <div style="grid-column:1/-1;display:none;" id="sidebarToggleWrap">
+    <button class="sidebar-toggle" id="sidebarToggle" onclick="toggleSidebar()">🔍 검색 필터</button>
+  </div>
   <!-- 사이드바 -->
-  <div class="sidebar">
+  <div class="sidebar" id="sidebarPanel">
 
     <!-- 초성 검색 -->
     <div class="side-card">
@@ -313,22 +365,22 @@ hr.mdv{border:none;border-top:1px solid #EDE0CE;margin:9px 0;}
         <tbody>
           <c:choose>
             <c:when test="${empty bookList}">
-              <tr><td colspan="7" class="empty-msg">조건에 맞는 도서가 없습니다.</td></tr>
+              <tr><td colspan="7" class="empty-msg td-empty">조건에 맞는 도서가 없습니다.</td></tr>
             </c:when>
             <c:otherwise>
               <c:forEach var="book" items="${bookList}">
                 <tr>
-                  <td>${book.bookId}</td>
-                  <td style="text-align:left;padding-left:14px;">
+                  <td class="td-num" data-label="번호">${book.bookId}</td>
+                  <td data-label="도서명" style="text-align:left;padding-left:14px;">
                     <a href="${pageContext.request.contextPath}/book/bookDetail.do?bookId=${book.bookId}"
                        style="color:#3B2F2F;text-decoration:none;font-weight:bold;">${book.title}</a>
                   </td>
-                  <td>${book.author}</td>
-                  <td>${book.publisher}</td>
-                  <td><span style="font-size:10px;color:#2E7D6B;">${empty book.category?'기타':book.category}</span></td>
-                  <td><span class="badge ${book.status=='Y'?'badge-y':'badge-n'}">${book.status=='Y'?'대출가능':'대출중'}</span></td>
+                  <td data-label="저자">${book.author}</td>
+                  <td data-label="출판사">${book.publisher}</td>
+                  <td data-label="분류"><span style="font-size:10px;color:#2E7D6B;">${empty book.category?'기타':book.category}</span></td>
+                  <td data-label="상태"><span class="badge ${book.status=='Y'?'badge-y':'badge-n'}">${book.status=='Y'?'대출가능':'대출중'}</span></td>
                   <c:if test="${sessionScope.loginVO.role=='ADMIN'}">
-                    <td>
+                    <td class="td-admin" data-label="관리">
                       <a href="${pageContext.request.contextPath}/book/bookModifyView.do?bookId=${book.bookId}" class="btn-e">수정</a>
                       <a href="${pageContext.request.contextPath}/book/bookDelete.do?bookId=${book.bookId}"
                          class="btn-d" onclick="return confirm('삭제?')">삭제</a>
@@ -388,9 +440,40 @@ hr.mdv{border:none;border-top:1px solid #EDE0CE;margin:9px 0;}
 
 <div class="footer">© 2026 폴리 인공지능 도서관</div>
 
+<div id="navOverlay" onclick="closeMobileNav()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:499;"></div>
+<nav id="mobileNav" style="display:none;position:fixed;top:0;right:0;width:260px;height:100vh;background:#3B2010;z-index:500;flex-direction:column;overflow-y:auto;">
+  <div style="background:#5C3D2E;padding:16px 18px;display:flex;justify-content:space-between;align-items:center;">
+    <span style="color:#F5E6C8;font-size:14px;font-weight:bold;">📚 폴리 도서관</span>
+    <button onclick="closeMobileNav()" style="background:none;border:none;color:#F5E6C8;font-size:20px;cursor:pointer;">✕</button>
+  </div>
+  <div style="padding:16px;display:flex;flex-direction:column;gap:2px;">
+    <a href="${pageContext.request.contextPath}/main/mainPage.do" style="color:#F5E6C8;text-decoration:none;padding:12px 8px;border-bottom:1px solid rgba(255,255,255,0.08);font-size:14px;">🏠 홈</a>
+    <a href="${pageContext.request.contextPath}/book/bookList.do" style="color:#F5E6C8;text-decoration:none;padding:12px 8px;border-bottom:1px solid rgba(255,255,255,0.08);font-size:14px;">📖 도서목록</a>
+    <c:if test="${not empty sessionScope.loginVO}">
+      <a href="${pageContext.request.contextPath}/loan/myLoan.do" style="color:#F5E6C8;text-decoration:none;padding:12px 8px;border-bottom:1px solid rgba(255,255,255,0.08);font-size:14px;">📋 내 대출</a>
+    </c:if>
+    <c:if test="${sessionScope.loginVO.role=='ADMIN'}">
+      <a href="${pageContext.request.contextPath}/admin/adminMain.do" style="color:#E8C87A;text-decoration:none;padding:12px 8px;border-bottom:1px solid rgba(255,255,255,0.08);font-size:14px;">⚙️ 관리자</a>
+    </c:if>
+    <c:choose>
+      <c:when test="${not empty sessionScope.loginVO}">
+        <a href="${pageContext.request.contextPath}/user/logout.do" onclick="return confirm('로그아웃?')" style="color:#C4A882;text-decoration:none;padding:12px 8px;font-size:14px;">🚪 로그아웃</a>
+      </c:when>
+      <c:otherwise>
+        <a href="${pageContext.request.contextPath}/user/loginView.do" style="color:#F5E6C8;text-decoration:none;padding:12px 8px;border-bottom:1px solid rgba(255,255,255,0.08);font-size:14px;">🔑 로그인</a>
+        <a href="${pageContext.request.contextPath}/user/joinView.do" style="color:#F5E6C8;text-decoration:none;padding:12px 8px;font-size:14px;">✏️ 회원가입</a>
+      </c:otherwise>
+    </c:choose>
+  </div>
+</nav>
+
 <script>
 var CP='${pageContext.request.contextPath}';
 
+function openMobileNav(){document.getElementById('mobileNav').style.display='flex';document.getElementById('navOverlay').style.display='block';document.body.style.overflow='hidden';}
+function closeMobileNav(){document.getElementById('mobileNav').style.display='none';document.getElementById('navOverlay').style.display='none';document.body.style.overflow='';}
+function toggleSidebar(){var p=document.getElementById('sidebarPanel'),t=document.getElementById('sidebarToggle');p.classList.toggle('open');t.classList.toggle('open');}
+(function(){var mq=window.matchMedia('(max-width:767px)');function chk(m){var w=document.getElementById('sidebarToggleWrap');if(w)w.style.display=m.matches?'block':'none';}chk(mq);if(mq.addEventListener)mq.addEventListener('change',chk);else mq.addListener(chk);})();
 // 토스트
 var urlP=new URLSearchParams(window.location.search);
 if(urlP.get('msg'))showToast(decodeURIComponent(urlP.get('msg').replace(/\+/g,' ')));

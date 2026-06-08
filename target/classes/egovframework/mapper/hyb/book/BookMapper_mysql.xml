@@ -74,6 +74,12 @@
         LIMIT #{pageSize} OFFSET #{offset}
     </select>
 
+    <select id="selectBookByTitle" parameterType="string" resultType="egovframework.example.book.service.BookVO">
+        SELECT BOOK_ID AS bookId, TITLE AS title, AUTHOR AS author,
+               PUBLISHER AS publisher, STATUS AS status, CATEGORY AS category
+        FROM BOOK WHERE TITLE = #{title} LIMIT 1
+    </select>
+
     <select id="selectBookCount" parameterType="map" resultType="int">
         SELECT COUNT(*) FROM BOOK
         <where>

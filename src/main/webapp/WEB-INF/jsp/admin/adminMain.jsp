@@ -5,10 +5,12 @@
 <html>
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;700&display=swap" rel="stylesheet">
 <title>관리자 대시보드 - 폴리 인공지능 도서관</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;}
+html,body{overflow-x:hidden;max-width:100%;}
 body{font-family:'Noto Serif KR',serif;background:#F0EBE0;color:#3B2F2F;min-height:100vh;display:flex;flex-direction:column;}
 /* 어드민 헤더 */
 .header{background:#3B2010;box-shadow:0 2px 8px rgba(0,0,0,0.4);}
@@ -59,6 +61,31 @@ tbody tr:hover{background:#FFF8EE;}
 .btn-sm{background:#E8D5B0;color:#5C3D2E;padding:4px 10px;border-radius:4px;font-size:11px;text-decoration:none;}
 .empty-msg{text-align:center;padding:30px;color:#A08060;font-size:13px;}
 .footer{text-align:center;padding:18px;color:#A08060;font-size:12px;border-top:1px solid #DDD0BC;}
+.hamburger{display:none;background:none;border:none;color:#F5E6C8;font-size:24px;cursor:pointer;padding:4px 8px;line-height:1;flex-shrink:0;}
+@media (max-width:767px){
+  .header,.header-inner,.main-layout,.stat-grid,.stat-card,.card,.card-header,.side-card,.side-body{max-width:100%;box-sizing:border-box;}
+  .hamburger{display:block;}
+  .nav-links{display:none;}
+  .header-inner{padding:10px 14px;flex-wrap:nowrap;}
+  .logo-area h1{font-size:14px;}
+  .logo-area .subtitle{font-size:10px;}
+  .main-layout{grid-template-columns:1fr;padding:0 12px;margin:16px auto;gap:16px;}
+  .stat-grid{grid-template-columns:1fr 1fr;gap:10px;}
+  .stat-num{font-size:22px;}
+  .card,.side-card{overflow:visible;}
+  .card-body{overflow-x:auto;-webkit-overflow-scrolling:touch;}
+  table{min-width:560px;}
+  .side-body div[style*="grid-template-columns"]{grid-template-columns:1fr 1fr!important;}
+  .card-header{flex-direction:column;align-items:flex-start;gap:6px;}
+  thead th{padding:9px 8px;font-size:11px;}
+  tbody td{padding:9px 8px;font-size:11px;}
+}
+@media (min-width:768px) and (max-width:1024px){
+  .main-layout{grid-template-columns:1fr 300px;padding:0 16px;gap:16px;}
+  .header-inner{padding:12px 20px;}
+  .stat-num{font-size:24px;}
+  table{font-size:11px;}
+}
 </style>
 </head>
 <body>
@@ -77,6 +104,7 @@ tbody tr:hover{background:#FFF8EE;}
       <a href="${pageContext.request.contextPath}/user/logout.do" class="logout"
          onclick="return confirm('로그아웃 하시겠습니까?')">로그아웃</a>
     </div>
+    <button class="hamburger" onclick="openMobileNav()">☰</button>
   </div>
 </div>
 
@@ -255,5 +283,24 @@ tbody tr:hover{background:#FFF8EE;}
 </div>
 
 <div class="footer">© 2026 폴리 인공지능 도서관 관리자 시스템</div>
+
+<div id="navOverlay" onclick="closeMobileNav()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:499;"></div>
+<nav id="mobileNav" style="display:none;position:fixed;top:0;right:0;width:260px;height:100vh;background:#2A1508;z-index:500;flex-direction:column;overflow-y:auto;">
+  <div style="background:#3B2010;padding:16px 18px;display:flex;justify-content:space-between;align-items:center;">
+    <span style="color:#F5E6C8;font-size:13px;font-weight:bold;">📚 관리자 메뉴</span>
+    <button onclick="closeMobileNav()" style="background:none;border:none;color:#F5E6C8;font-size:20px;cursor:pointer;">✕</button>
+  </div>
+  <div style="padding:16px;display:flex;flex-direction:column;gap:2px;">
+    <a href="${pageContext.request.contextPath}/admin/adminMain.do" style="color:#F5E6C8;text-decoration:none;padding:12px 8px;border-bottom:1px solid rgba(255,255,255,0.08);font-size:14px;">🏠 대시보드</a>
+    <a href="${pageContext.request.contextPath}/book/bookList.do" style="color:#F5E6C8;text-decoration:none;padding:12px 8px;border-bottom:1px solid rgba(255,255,255,0.08);font-size:14px;">📖 도서목록</a>
+    <a href="${pageContext.request.contextPath}/book/bookRegisterView.do" style="color:#F5E6C8;text-decoration:none;padding:12px 8px;border-bottom:1px solid rgba(255,255,255,0.08);font-size:14px;">➕ 도서등록</a>
+    <a href="${pageContext.request.contextPath}/admin/userList.do" style="color:#F5E6C8;text-decoration:none;padding:12px 8px;border-bottom:1px solid rgba(255,255,255,0.08);font-size:14px;">👥 회원관리</a>
+    <a href="${pageContext.request.contextPath}/user/logout.do" onclick="return confirm('로그아웃 하시겠습니까?')" style="color:#C4A882;text-decoration:none;padding:12px 8px;font-size:14px;">🚪 로그아웃</a>
+  </div>
+</nav>
+<script>
+function openMobileNav(){document.getElementById('mobileNav').style.display='flex';document.getElementById('navOverlay').style.display='block';document.body.style.overflow='hidden';}
+function closeMobileNav(){document.getElementById('mobileNav').style.display='none';document.getElementById('navOverlay').style.display='none';document.body.style.overflow='';}
+</script>
 </body>
 </html>

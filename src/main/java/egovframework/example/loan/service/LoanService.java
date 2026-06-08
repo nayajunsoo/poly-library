@@ -20,4 +20,5 @@ public interface LoanService {
     List<Map<String, Object>> selectPendingReturnList() throws Exception;
     List<Map<String, Object>> selectMonthlyTop30() throws Exception;
     List<Map<String, Object>> selectAllLoanList() throws Exception;
+    BookVO findBookByTitle(String title) throws Exception;
 }

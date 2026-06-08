@@ -111,6 +111,11 @@ public class LoanServiceImpl implements LoanService {
         return list;
     }
 
+    @Override
+    public BookVO findBookByTitle(String title) throws Exception {
+        return sqlSession.selectOne(NS_BOOK + "selectBookByTitle", title);
+    }
+
     private void attachDday(List<Map<String, Object>> list) {
         LocalDate today = LocalDate.now();
         for (Map<String, Object> row : list) {

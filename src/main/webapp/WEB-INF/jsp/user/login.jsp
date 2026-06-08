@@ -4,11 +4,13 @@
 <html>
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;700&display=swap" rel="stylesheet">
 <title>로그인 - 폴리 인공지능 도서관</title>
 <script>var msg="${msg}"; if(msg&&msg!=""&&msg!="null"){alert(decodeURIComponent(msg.replace(/\+/g,' ')));}</script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;}
+html,body{overflow-x:hidden;max-width:100%;}
 body{font-family:'Noto Serif KR',serif;background-color:#F5F0E8;display:flex;flex-direction:column;min-height:100vh;}
 .header{background-color:#5C3D2E;padding:20px;box-shadow:0 2px 8px rgba(0,0,0,0.3);text-align:center;position:relative;}
 .header h1{color:#F5E6C8;font-size:22px;letter-spacing:1px;}
@@ -26,6 +28,17 @@ body{font-family:'Noto Serif KR',serif;background-color:#F5F0E8;display:flex;fle
 .login-footer{margin-top:12px;text-align:center;font-size:14px;color:#A08060;}
 .login-footer a{color:#A0522D;text-decoration:none;font-weight:bold;}
 .footer{text-align:center;padding:24px;color:#A08060;font-size:13px;border-top:1px solid #DDD0BC;}
+@media (max-width:767px){
+  .header,.login-container,.login-card,.input-group,.input-group input,.btn-login{max-width:100%;box-sizing:border-box;}
+  .header{padding:14px 16px;}
+  .header h1{font-size:17px;}
+  .btn-back{left:12px;font-size:11px;padding:5px 10px;}
+  .login-card{padding:28px 18px;}
+  .login-card h2{font-size:19px;margin-bottom:22px;}
+  .input-group input{padding:14px 12px;font-size:15px;}
+  .btn-login{padding:16px;font-size:15px;}
+  .footer{font-size:12px;padding:16px;}
+}
 </style>
 </head>
 <body>

@@ -4,10 +4,12 @@
 <html>
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;700&display=swap" rel="stylesheet">
 <title>도서 상세 - 폴리 인공지능 도서관</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;}
+html,body{overflow-x:hidden;max-width:100%;}
 body{font-family:'Noto Serif KR',serif;background:#F5F0E8;color:#3B2F2F;min-height:100vh;}
 .header{background:#5C3D2E;box-shadow:0 2px 8px rgba(0,0,0,0.3);}
 .header-inner{max-width:1100px;margin:0 auto;padding:16px 30px;display:flex;align-items:center;justify-content:space-between;}
@@ -30,6 +32,25 @@ body{font-family:'Noto Serif KR',serif;background:#F5F0E8;color:#3B2F2F;min-heig
 .btn-edit:hover{background:#7B3F20;}
 .btn-back{background:#E8D5B0;color:#5C3D2E;padding:10px 22px;border:none;border-radius:6px;font-size:13px;text-decoration:none;display:inline-block;}
 .footer{text-align:center;margin-top:50px;padding:20px;color:#A08060;font-size:12px;border-top:1px solid #DDD0BC;}
+.hamburger{display:none;background:none;border:none;color:#F5E6C8;font-size:24px;cursor:pointer;padding:4px 8px;line-height:1;}
+@media (max-width:767px){
+  .header,.header-inner,.container,.detail-card,.detail-row,.btn-group{max-width:100%;box-sizing:border-box;}
+  .hamburger{display:block;}
+  .nav-links{display:none;}
+  .header-inner{padding:12px 16px;}
+  .header h1{font-size:16px;}
+  .container{padding:0 14px;margin:20px auto;}
+  .page-title{font-size:18px;}
+  .detail-row{flex-direction:column;}
+  .detail-label{width:100%;min-width:unset;padding:10px 14px 4px;font-size:12px;}
+  .detail-value{padding:4px 14px 12px;font-size:13px;}
+  .btn-group{flex-wrap:wrap;}
+  .btn-edit,.btn-back{flex:1;text-align:center;padding:12px 16px;font-size:13px;}
+}
+@media (min-width:768px) and (max-width:1024px){
+  .container{padding:0 20px;}
+  .detail-label{width:100px;min-width:100px;}
+}
 </style>
 </head>
 <body>
@@ -42,6 +63,7 @@ body{font-family:'Noto Serif KR',serif;background:#F5F0E8;color:#3B2F2F;min-heig
         <a href="${pageContext.request.contextPath}/admin/adminMain.do">관리자 대시보드</a>
       </c:if>
     </div>
+    <button class="hamburger" onclick="openMobileNav()">☰</button>
   </div>
 </div>
 <div class="container">
@@ -70,5 +92,23 @@ body{font-family:'Noto Serif KR',serif;background:#F5F0E8;color:#3B2F2F;min-heig
   </div>
 </div>
 <div class="footer">© 2026 폴리 인공지능 도서관</div>
+
+<div id="navOverlay" onclick="closeMobileNav()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:499;"></div>
+<nav id="mobileNav" style="display:none;position:fixed;top:0;right:0;width:260px;height:100vh;background:#3B2010;z-index:500;flex-direction:column;overflow-y:auto;">
+  <div style="background:#5C3D2E;padding:16px 18px;display:flex;justify-content:space-between;align-items:center;">
+    <span style="color:#F5E6C8;font-size:14px;font-weight:bold;">📚 폴리 도서관</span>
+    <button onclick="closeMobileNav()" style="background:none;border:none;color:#F5E6C8;font-size:20px;cursor:pointer;">✕</button>
+  </div>
+  <div style="padding:16px;display:flex;flex-direction:column;gap:2px;">
+    <a href="${pageContext.request.contextPath}/book/bookList.do" style="color:#F5E6C8;text-decoration:none;padding:12px 8px;border-bottom:1px solid rgba(255,255,255,0.08);font-size:14px;">📖 도서 목록</a>
+    <c:if test="${sessionScope.loginVO.role=='ADMIN'}">
+      <a href="${pageContext.request.contextPath}/admin/adminMain.do" style="color:#E8C87A;text-decoration:none;padding:12px 8px;border-bottom:1px solid rgba(255,255,255,0.08);font-size:14px;">⚙️ 관리자 대시보드</a>
+    </c:if>
+  </div>
+</nav>
+<script>
+function openMobileNav(){document.getElementById('mobileNav').style.display='flex';document.getElementById('navOverlay').style.display='block';document.body.style.overflow='hidden';}
+function closeMobileNav(){document.getElementById('mobileNav').style.display='none';document.getElementById('navOverlay').style.display='none';document.body.style.overflow='';}
+</script>
 </body>
 </html>

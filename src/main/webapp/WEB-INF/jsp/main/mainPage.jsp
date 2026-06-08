@@ -5,10 +5,12 @@
 <html>
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;700&display=swap" rel="stylesheet">
 <title>폴리 인공지능 도서관</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;}
+html,body{overflow-x:hidden;max-width:100%;}
 body{font-family:'Noto Serif KR',serif;background:#F5F0E8;color:#3B2F2F;min-height:100vh;}
 /* 헤더 */
 .header{background:#5C3D2E;box-shadow:0 2px 8px rgba(0,0,0,0.3);position:sticky;top:0;z-index:200;}
@@ -121,6 +123,42 @@ hr.mdv{border:none;border-top:1px solid #EDE0CE;margin:10px 0;}
 .toast{display:none;position:fixed;top:20px;left:50%;transform:translateX(-50%);background:#2E7D6B;color:#fff;padding:10px 22px;border-radius:7px;font-size:13px;font-weight:bold;z-index:9999;}
 .toast.err{background:#C62828;}
 .footer{text-align:center;padding:20px;color:#A08060;font-size:12px;border-top:1px solid #DDD0BC;margin-top:20px;}
+.hamburger{display:none;background:none;border:none;color:#F5E6C8;font-size:24px;cursor:pointer;padding:4px 8px;line-height:1;flex-shrink:0;}
+/* 태블릿+모바일 공통: 햄버거 전환 */
+@media (max-width:1024px){
+  .hamburger{display:block;}
+  .nav-links{display:none;}
+}
+@media (max-width:767px){
+  .header,.header-inner,.container,.top30-grid,.book-card,.ai-section,.ai-header,.ai-body,.modal,.hero,.hero-search{max-width:100%;box-sizing:border-box;}
+  .header-inner{padding:10px 14px;flex-wrap:nowrap;}
+  .header-search{display:none;}
+  .logo h1{font-size:15px;}
+  .hero{padding:28px 16px;}
+  .hero h2{font-size:20px;}
+  .hero p{font-size:13px;margin-bottom:18px;}
+  .hero-search{flex-direction:column;gap:0;border-radius:8px;overflow:hidden;}
+  .hero-search select{border-radius:8px 8px 0 0;border-bottom:1px solid #DDD0BC;}
+  .hero-search input{border-radius:0;}
+  .hero-search button{border-radius:0 0 8px 8px;padding:14px;}
+  .container{padding:20px 14px;}
+  .sec-hdr{flex-direction:column;align-items:flex-start;gap:10px;margin-bottom:14px;}
+  .top30-grid{grid-template-columns:1fr;gap:10px;margin-bottom:28px;}
+  .book-card{padding:12px 14px;}
+  .modal{max-width:100%;max-height:100vh;border-radius:0;padding:16px 14px 12px;}
+  .ms-row{flex-wrap:wrap;}
+  .ms-row select{width:100%;}
+  .ai-section{}
+  .ai-header{padding:14px 16px;flex-direction:column;gap:6px;align-items:flex-start;}
+  .ai-body{padding:20px 16px;}
+}
+@media (min-width:768px) and (max-width:1024px){
+  .header-inner{padding:12px 20px;}
+  .header-search{max-width:400px;}
+  .container{padding:28px 20px;}
+  .top30-grid{grid-template-columns:repeat(auto-fill,minmax(260px,1fr));}
+  .modal{max-width:90%;}
+}
 </style>
 </head>
 <body>
@@ -167,6 +205,7 @@ hr.mdv{border:none;border-top:1px solid #EDE0CE;margin:10px 0;}
         </c:otherwise>
       </c:choose>
     </div>
+    <button class="hamburger" onclick="openMobileNav()">☰</button>
   </div>
 </div>
 
@@ -278,7 +317,36 @@ hr.mdv{border:none;border-top:1px solid #EDE0CE;margin:10px 0;}
 
 <div class="footer">© 2026 폴리 인공지능 도서관 · Poly AI Library Management System</div>
 
+<div id="navOverlay" onclick="closeMobileNav()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:499;"></div>
+<nav id="mobileNav" style="display:none;position:fixed;top:0;right:0;width:260px;height:100vh;background:#3B2010;z-index:500;flex-direction:column;overflow-y:auto;">
+  <div style="background:#5C3D2E;padding:16px 18px;display:flex;justify-content:space-between;align-items:center;">
+    <span style="color:#F5E6C8;font-size:14px;font-weight:bold;">📚 폴리 도서관</span>
+    <button onclick="closeMobileNav()" style="background:none;border:none;color:#F5E6C8;font-size:20px;cursor:pointer;">✕</button>
+  </div>
+  <div style="padding:16px;display:flex;flex-direction:column;gap:2px;">
+    <a href="${pageContext.request.contextPath}/main/mainPage.do" style="color:#F5E6C8;text-decoration:none;padding:12px 8px;border-bottom:1px solid rgba(255,255,255,0.08);font-size:14px;">🏠 홈</a>
+    <a href="${pageContext.request.contextPath}/book/bookList.do" style="color:#F5E6C8;text-decoration:none;padding:12px 8px;border-bottom:1px solid rgba(255,255,255,0.08);font-size:14px;">📖 도서 목록</a>
+    <c:if test="${not empty sessionScope.loginVO}">
+      <a href="${pageContext.request.contextPath}/loan/myLoan.do" style="color:#F5E6C8;text-decoration:none;padding:12px 8px;border-bottom:1px solid rgba(255,255,255,0.08);font-size:14px;">📋 내 대출</a>
+    </c:if>
+    <c:if test="${sessionScope.loginVO.role=='ADMIN'}">
+      <a href="${pageContext.request.contextPath}/admin/adminMain.do" style="color:#E8C87A;text-decoration:none;padding:12px 8px;border-bottom:1px solid rgba(255,255,255,0.08);font-size:14px;">⚙️ 관리자</a>
+    </c:if>
+    <c:choose>
+      <c:when test="${not empty sessionScope.loginVO}">
+        <a href="${pageContext.request.contextPath}/user/logout.do" onclick="return confirm('로그아웃?')" style="color:#C4A882;text-decoration:none;padding:12px 8px;font-size:14px;">🚪 로그아웃</a>
+      </c:when>
+      <c:otherwise>
+        <a href="${pageContext.request.contextPath}/user/loginView.do" style="color:#F5E6C8;text-decoration:none;padding:12px 8px;border-bottom:1px solid rgba(255,255,255,0.08);font-size:14px;">🔑 로그인</a>
+        <a href="${pageContext.request.contextPath}/user/joinView.do" style="color:#F5E6C8;text-decoration:none;padding:12px 8px;font-size:14px;">✏️ 회원가입</a>
+      </c:otherwise>
+    </c:choose>
+  </div>
+</nav>
+
 <script>
+function openMobileNav(){document.getElementById('mobileNav').style.display='flex';document.getElementById('navOverlay').style.display='block';document.body.style.overflow='hidden';}
+function closeMobileNav(){document.getElementById('mobileNav').style.display='none';document.getElementById('navOverlay').style.display='none';document.body.style.overflow='';}
 document.getElementById('monthBadge').textContent = (new Date().getMonth()+1)+'월';
 
 var urlP = new URLSearchParams(window.location.search);
